@@ -1,20 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { AppService } from './app.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Controller, Get } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  // 1. Registration Route: POST http://localhost:5000/register
-  @Post('register')
-  register(@Body() body: CreateUserDto) {
-    return this.appService.registerUser(body);
-  }
-
-  // 2. Login Route: POST http://localhost:5000/login
-  @Post('login')
-  login(@Body() body: CreateUserDto) {
-    return this.appService.loginUser(body);
+  @Get()
+  getHome() {
+    return {
+      message: 'Welcome to the E-Commerce API (Admin Section Ready)',
+      availableRoutes: {
+        admin: '/admin',
+      },
+    };
   }
 }
