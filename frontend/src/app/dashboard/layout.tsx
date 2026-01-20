@@ -1,36 +1,43 @@
 "use client";
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/DashboardNavbar";
-import Footer from "@/components/Footer"; // 👈 ফুটার ইম্পোর্ট করুন
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Sidebar from "@/components/dashboard/Sidebar";
+import DashboardNavbar from "@/components/common/DashboardNavbar"; // 👈 নতুন ইম্পোর্ট
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) router.push("/login");
-    else setLoading(false);
+    if (!token) {
+      router.push("/login");
+    } else {
+      setIsAuthorized(true);
+    }
   }, [router]);
 
-  if (loading) return <div className="flex h-screen items-center justify-center bg-gray-50">Loading...</div>;
+  if (!isAuthorized) return null;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-slate-50">
+      {/* বাম পাশে সাইডবার */}
       <Sidebar />
       
-      <div className="flex-1 ml-64 flex flex-col min-h-screen">
-        <Navbar /> {/* 👈 নতুন হেডার এখানে বসবে */}
-        
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* উপরে ড্যাশবোর্ড ন্যাপবার */}
+        <DashboardNavbar /> 
+
+        {/* মেইন কন্টেন্ট এরিয়া */}
         <main className="flex-1 p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto min-h-[calc(100vh-200px)]"> 
+          <div className="max-w-6xl mx-auto">
             {children}
           </div>
         </main>
-
-        <Footer /> {/* 👈 নতুন ফুটার এখানে বসবে */}
       </div>
     </div>
   );

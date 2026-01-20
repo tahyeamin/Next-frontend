@@ -1,114 +1,47 @@
 "use client";
-
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import api from "@/lib/axios";
+import Link from "next/link";
+import { Store } from "lucide-react";
 
-export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",    // ব্যাকএন্ড অনুযায়ী 'phone' ব্যবহার করা হয়েছে
-    password: "",
-  });
-  
-  const [error, setError] = useState("");
+export default function Register() {
   const router = useRouter();
+  const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-
     try {
-      // আপনার ব্যাকএন্ড পোর্ট (৩০০০) এবং পাথ ঠিক আছে কি না নিশ্চিত হয়ে নিন
-      const response = await axios.post("http://localhost:3000/seller/auth/register", formData);
-      
-      if (response.status === 201 || response.status === 200) {
-        alert("Registration Successful!");
-        router.push("/seller/login");
-      }
-    } catch (err: any) {
-      // ব্যাকএন্ডের ভ্যালিডেশন এররগুলো এখানে দেখাবে
-      const message = err.response?.data?.message || "Registration failed";
-      setError(Array.isArray(message) ? message.join(", ") : message);
+      await api.post("/seller/auth/register", form);
+      alert("Registration Successful! Please Login.");
+      router.push("/login");
+    } catch (error: any) {
+      alert("Registration Failed: " + (error.response?.data?.message || "Unknown Error"));
     }
   };
 
   return (
-    <div style={{ maxWidth: "450px", margin: "50px auto", padding: "30px", border: "1px solid #ddd", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}>
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Create Seller Account</h2>
-      
-      {error && (
-        <div style={{ backgroundColor: "#ffebee", color: "#c62828", padding: "10px", borderRadius: "5px", marginBottom: "15px", fontSize: "14px" }}>
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        {/* Full Name Field */}
-        <div>
-          <label style={{ display: "block", marginBottom: "5px" }}>Full Name</label>
-          <input
-            type="text"
-            name="fullName"
-            placeholder="Enter your full name"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
-          />
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-10">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <div className="text-center mb-8">
+          <Store className="w-10 h-10 text-blue-600 mx-auto mb-2" />
+          <h1 className="text-2xl font-bold">Join SellerHub</h1>
         </div>
 
-        {/* Email Field */}
-        <div>
-          <label style={{ display: "block", marginBottom: "5px" }}>Email Address</label>
-          <input
-            type="email"
-            name="email"
-            placeholder="example@mail.com"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
-          />
-        </div>
-
-        {/* Phone Field - ব্যাকএন্ডের সাথে মিল রেখে */}
-        <div>
-          <label style={{ display: "block", marginBottom: "5px" }}>Phone Number</label>
-          <input
-            type="tel"
-            name="phone"  // এখানে 'phone' ই থাকতে হবে
-            placeholder="017XXXXXXXX"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
-          />
-        </div>
-
-        {/* Password Field */}
-        <div>
-          <label style={{ display: "block", marginBottom: "5px" }}>Password</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
-          />
-        </div>
-        
-        <button type="submit" style={{ padding: "12px", backgroundColor: "#000", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "16px", marginTop: "10px" }}>
-          Sign Up as Seller
-        </button>
-      </form>
+        <form onSubmit={handleRegister} className="space-y-4">
+          <input type="text" placeholder="Full Name" required className="w-full p-3 border rounded-lg" onChange={(e) => setForm({...form, name: e.target.value})} />
+          <input type="email" placeholder="Email" required className="w-full p-3 border rounded-lg" onChange={(e) => setForm({...form, email: e.target.value})} />
+          <input type="text" placeholder="Phone" required className="w-full p-3 border rounded-lg" onChange={(e) => setForm({...form, phone: e.target.value})} />
+          <input type="password" placeholder="Password" required className="w-full p-3 border rounded-lg" onChange={(e) => setForm({...form, password: e.target.value})} />
+          
+          <button type="submit" className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
+            Create Account
+          </button>
+        </form>
+        <p className="mt-4 text-center text-sm text-slate-500">
+          Already have an account? <Link href="/login" className="text-blue-600 font-bold">Login</Link>
+        </p>
+      </div>
     </div>
   );
 }

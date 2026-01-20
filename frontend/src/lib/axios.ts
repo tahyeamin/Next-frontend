@@ -1,7 +1,6 @@
-// src/lib/axios.ts
 import axios from "axios";
 
-// আপনার ব্যাকএন্ড পোর্ট ৩০০০
+// আপনার ব্যাকএন্ড পোর্ট (Backend URL)
 const API_URL = "http://localhost:3000";
 
 const api = axios.create({
@@ -11,7 +10,7 @@ const api = axios.create({
   },
 });
 
-// রিকোয়েস্ট ইন্টারসেপ্টর: লোকাল স্টোরেজ থেকে টোকেন নিয়ে হেডারে বসাবে
+// ইন্টারসেপ্টর: প্রতিবার রিকোয়েস্ট পাঠানোর আগে টোকেন চেক করবে
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
