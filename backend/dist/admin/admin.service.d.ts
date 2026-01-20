@@ -4,7 +4,9 @@ import { MailService } from '../seller/mail/mail.service';
 export declare class AdminService {
     private sellerRepo;
     private mailService;
+    private pusher;
     constructor(sellerRepo: Repository<Seller>, mailService: MailService);
+    triggerNewSellerNotification(sellerName: string): Promise<void>;
     getPendingSellers(): Promise<Seller[]>;
     approveSeller(id: string): Promise<{
         message: string;

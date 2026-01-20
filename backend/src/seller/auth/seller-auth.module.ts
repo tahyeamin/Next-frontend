@@ -5,6 +5,8 @@ import { SellerAuthService } from './seller-auth.service';
 import { SellerJwtStrategy } from './seller-jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Seller } from '../entities/seller.entity';
+import { AdminModule } from 'src/admin/admin.module';
+
 //modules
 @Module({
   imports: [
@@ -13,6 +15,7 @@ import { Seller } from '../entities/seller.entity';
       secret: process.env.SELLER_JWT_SECRET || 'seller-secret-12345',
       signOptions: { expiresIn: '7d' },
     }),
+    AdminModule,
   ],
   controllers: [SellerAuthController],
   providers: [SellerAuthService, SellerJwtStrategy],

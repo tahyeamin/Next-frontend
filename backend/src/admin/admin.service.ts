@@ -3,15 +3,38 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Seller, SellerStatus } from '../seller/entities/seller.entity';
 import { MailService } from '../seller/mail/mail.service';
+import  Pusher from 'pusher';
 
 @Injectable()
 export class AdminService {
+  private pusher: Pusher;
+
   constructor(
     @InjectRepository(Seller)
     private sellerRepo: Repository<Seller>,
     private mailService: MailService, 
-  ) {}
+  ) {
+    
+    this.pusher = new Pusher({
+      appId: "2104606",
+      key: "2b6a6791df8a8256cbe9",
+      secret: "931444bdb36fc3a303ce",
+      cluster: "ap2",
+      useTLS: true
+    });
+  }
 
+  async triggerNewSellerNotification(sellerName: string) {
+    try {
+      await this.pusher.trigger('admin-channel', 'new-seller', {
+        message: `New seller registration: ${sellerName}`,
+        timestamp: new Date().toISOString(),
+      });
+      console.log('Pusher notification sent for:', sellerName);
+    } catch (error) {
+      console.error('Pusher notification failed:', error.message);
+    }
+  }
 
   async getPendingSellers() {
     return this.sellerRepo.find({
@@ -44,7 +67,6 @@ export class AdminService {
     return { message: 'Seller approved & email sent' };
   }
 
- 
   async rejectSeller(id: string, reason?: string) {
     const seller = await this.sellerRepo.findOne({ where: { id } });
     if (!seller) throw new NotFoundException('Seller not found');

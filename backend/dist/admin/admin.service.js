@@ -11,6 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminService = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,12 +21,33 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const seller_entity_1 = require("../seller/entities/seller.entity");
 const mail_service_1 = require("../seller/mail/mail.service");
+const pusher_1 = __importDefault(require("pusher"));
 let AdminService = class AdminService {
     sellerRepo;
     mailService;
+    pusher;
     constructor(sellerRepo, mailService) {
         this.sellerRepo = sellerRepo;
         this.mailService = mailService;
+        this.pusher = new pusher_1.default({
+            appId: "2104606",
+            key: "2b6a6791df8a8256cbe9",
+            secret: "931444bdb36fc3a303ce",
+            cluster: "ap2",
+            useTLS: true
+        });
+    }
+    async triggerNewSellerNotification(sellerName) {
+        try {
+            await this.pusher.trigger('admin-channel', 'new-seller', {
+                message: `New seller registration: ${sellerName}`,
+                timestamp: new Date().toISOString(),
+            });
+            console.log('Pusher notification sent for:', sellerName);
+        }
+        catch (error) {
+            console.error('Pusher notification failed:', error.message);
+        }
     }
     async getPendingSellers() {
         return this.sellerRepo.find({

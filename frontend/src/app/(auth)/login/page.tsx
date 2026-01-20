@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-// import { useRouter } from "next/navigation"; // আপাতত দরকার নেই কারণ আমরা window.location ব্যবহার করছি
+// import { useRouter } from "next/navigation"; 
 import api from "@/lib/axios";
 import Link from "next/link";
 import { Store, Loader2, LogIn } from "lucide-react";
@@ -14,39 +14,38 @@ export default function Login() {
     password: "",
   });
 
-  // ইনপুট হ্যান্ডলার
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // লগইন ফাংশন
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      console.log("Sending login request...", form); // চেক ১: ডাটা ঠিক যাচ্ছে কিনা
+      console.log("Sending login request...", form);
 
-      // ১. ব্যাকএন্ডে রিকোয়েস্ট
+      
       const res = await api.post("/seller/auth/login", form);
       
-      // ২. ডিবাগিং: কনসোলে পুরো রেসপন্স প্রিন্ট হবে
+      
       console.log("🔥 Backend Response:", res.data); 
 
-      // ৩. টোকেন খোঁজা (বিভিন্ন নামে আসতে পারে)
+      
       const token = res.data.token || res.data.accessToken || res.data.access_token;
 
       if (token) {
-        // ৪. টোকেন সেভ করা
+       
         localStorage.setItem("token", token);
         
-        // ৫. সফল মেসেজ
         alert("Login Successful! Redirecting to Dashboard...");
         
-        // ৬. ফোর্স রিডাইরেক্ট (ড্যাশবোর্ডে পাঠাবেই)
+        
         window.location.href = "/dashboard";
       } else {
-        // যদি টোকেন না থাকে, তবে ব্যাকএন্ড কী পাঠিয়েছে তা দেখাবে
+       
         console.error("Token missing in response:", res.data);
         alert("Login Failed! No token received. Server sent: " + JSON.stringify(res.data));
         setLoading(false);
@@ -55,7 +54,7 @@ export default function Login() {
     } catch (error: any) {
       console.error("❌ Login Error Full Object:", error);
       
-      // এরর মেসেজ হ্যান্ডলিং
+     
       const errorMsg = error.response?.data?.message 
         || error.message 
         || "Login Request Failed";

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Seller } from '../seller/entities/seller.entity';
-import { MailService } from '../seller/mail/mail.service';   // ← এই লাইনটা যোগ করো
+import { MailService } from '../seller/mail/mail.service';  
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 
@@ -14,5 +14,6 @@ import { AdminService } from './admin.service';
     AdminService,
     MailService,  
   ],
+  exports: [AdminService],
 })
 export class AdminModule {}

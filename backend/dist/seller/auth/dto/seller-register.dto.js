@@ -14,11 +14,13 @@ const class_validator_1 = require("class-validator");
 class SellerRegisterDto {
     fullName;
     email;
-    phone;
     password;
+    phone;
+    shopName;
 }
 exports.SellerRegisterDto = SellerRegisterDto;
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], SellerRegisterDto.prototype, "fullName", void 0);
@@ -27,12 +29,18 @@ __decorate([
     __metadata("design:type", String)
 ], SellerRegisterDto.prototype, "email", void 0);
 __decorate([
-    (0, class_validator_1.IsMobilePhone)('bn-BD'),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MinLength)(6, { message: 'Password must be at least 6 characters' }),
+    __metadata("design:type", String)
+], SellerRegisterDto.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], SellerRegisterDto.prototype, "phone", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(8),
     __metadata("design:type", String)
-], SellerRegisterDto.prototype, "password", void 0);
+], SellerRegisterDto.prototype, "shopName", void 0);
 //# sourceMappingURL=seller-register.dto.js.map

@@ -5,19 +5,15 @@ export declare class SellerAuthController {
     private authService;
     constructor(authService: SellerAuthService);
     register(dto: SellerRegisterDto): Promise<{
-        access_token: string;
-        seller: {
-            id: string;
-            email: string;
-            status: import("../entities/seller.entity").SellerStatus;
-        };
+        message: string;
     }>;
     login(dto: SellerLoginDto): Promise<{
         access_token: string;
         seller: {
             id: string;
+            name: string;
             email: string;
-            status: import("../entities/seller.entity").SellerStatus;
+            status: import("../entities/seller.entity").SellerStatus.APPROVED | import("../entities/seller.entity").SellerStatus.BLOCKED;
         };
     }>;
 }

@@ -10,13 +10,13 @@ export default function AddProduct() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   
-  // ফর্ম ডাটা স্টেট
+  // ফর্ম ডাটা স্টেট (Category সরানো হয়েছে)
   const [form, setForm] = useState({
     name: "",
     description: "",
     price: "",
     stock: "",
-    category: "",
+    // category removed
   });
 
   // ইমেজ স্টেট
@@ -24,17 +24,17 @@ export default function AddProduct() {
   const [preview, setPreview] = useState<string | null>(null);
 
   // ইনপুট হ্যান্ডলার (টেক্সট)
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ ইমেজ হ্যান্ডলার (কনসোল লগসহ)
+  // ইমেজ হ্যান্ডলার
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log("File Selected:", file.name); // ডিবাগিং
+      console.log("File Selected:", file.name);
       setImage(file);
-      setPreview(URL.createObjectURL(file)); // প্রিভিউ তৈরি
+      setPreview(URL.createObjectURL(file));
     }
   };
 
@@ -44,13 +44,13 @@ export default function AddProduct() {
     setPreview(null);
   };
 
-  // ✅ সাবমিট ফাংশন (অথেন্টিকেশন ফিক্সড)
+  // সাবমিট ফাংশন
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // ১. টোকেন চেক (লগইন না থাকলে আটকাবে)
+      // ১. টোকেন চেক
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Session expired! Please login again.");
@@ -64,9 +64,9 @@ export default function AddProduct() {
       formData.append("description", form.description);
       formData.append("price", form.price);
       formData.append("stock", form.stock);
-      formData.append("category", form.category);
+      // formData.append("category", form.category); // Removed
       
-      // ৩. ইমেজ অ্যাপেন্ড (চেক করুন ব্যাকএন্ডে নাম 'image' নাকি 'file')
+      // ৩. ইমেজ অ্যাপেন্ড
       if (image) {
         formData.append("image", image); 
       } else {
@@ -77,22 +77,21 @@ export default function AddProduct() {
 
       console.log("🚀 Sending Data to Backend...");
 
-      // ৪. রিকোয়েস্ট পাঠানো (ম্যানুয়ালি টোকেন হেডার অ্যাড করা হয়েছে)
-      const res = await api.post("/seller/products/upload", formData, {
+      // ৪. রিকোয়েস্ট পাঠানো
+      const res = await api.post("/seller/products", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          "Authorization": `Bearer ${token}` // 🔥 এই লাইনটি 401 Unauthorized এরর ফিক্স করবে
+          "Authorization": `Bearer ${token}`
         },
       });
 
       console.log("✅ Success Response:", res.data);
       alert("Product Uploaded Successfully!");
-      router.push("/dashboard/products"); // সফল হলে লিস্ট পেজে ফেরত যাবে
+      router.push("/dashboard/products");
 
     } catch (error: any) {
       console.error("❌ Upload Error Details:", error);
       
-      // এরর মেসেজ হ্যান্ডলিং
       const serverMessage = error.response?.data?.message || error.message;
       
       if (error.response?.status === 401) {
@@ -111,7 +110,7 @@ export default function AddProduct() {
   return (
     <div className="max-w-4xl mx-auto pb-10">
       
-      {/* হেডার এবং ব্যাক বাটন */}
+      {/* হেডার */}
       <div className="flex items-center gap-4 mb-8">
         <Link href="/dashboard/products" className="p-2 bg-white border rounded-lg hover:bg-gray-50 transition">
           <ChevronLeft className="w-5 h-5 text-slate-600" />
@@ -125,14 +124,13 @@ export default function AddProduct() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
         <form onSubmit={handleSubmit} className="space-y-8">
           
-          {/* ✅ ১. ইমেজ আপলোড সেকশন (ক্লিক ফিক্সড - Z-Index 50) */}
+          {/* ইমেজ আপলোড সেকশন */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">Product Image</label>
             
             {!preview ? (
               <div className="relative border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 h-64 flex flex-col items-center justify-center hover:bg-blue-50 hover:border-blue-300 transition group cursor-pointer">
                 
-                {/* 👇 ইনপুটটি পুরো বক্সের উপরে ট্রান্সপারেন্ট অবস্থায় থাকবে */}
                 <input 
                   type="file" 
                   accept="image/*"
@@ -152,7 +150,6 @@ export default function AddProduct() {
                 </div>
               </div>
             ) : (
-              // প্রিভিউ সেকশন
               <div className="relative w-full md:w-1/2 h-64 border rounded-xl overflow-hidden group shadow-md mx-auto md:mx-0">
                 <img 
                   src={preview} 
@@ -171,7 +168,7 @@ export default function AddProduct() {
             )}
           </div>
 
-          {/* ২. ইনফরমেশন সেকশন */}
+          {/* ইনফরমেশন সেকশন (Category Removed) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Product Name</label>
@@ -185,21 +182,7 @@ export default function AddProduct() {
               />
             </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Category</label>
-              <select 
-                name="category" 
-                required 
-                onChange={handleChange} 
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-              >
-                <option value="">Select a Category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Fashion">Fashion</option>
-                <option value="Home">Home & Living</option>
-                <option value="Beauty">Beauty & Health</option>
-              </select>
-            </div>
+            {/* Category Input was here - REMOVED */}
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Price ($)</label>
@@ -238,7 +221,7 @@ export default function AddProduct() {
             ></textarea>
           </div>
 
-          {/* ৩. সাবমিট বাটন */}
+          {/* সাবমিট বাটন */}
           <div className="flex justify-end pt-6 border-t border-gray-100">
             <button 
               type="submit" 

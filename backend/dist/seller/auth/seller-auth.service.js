@@ -52,36 +52,65 @@ const typeorm_2 = require("typeorm");
 const seller_entity_1 = require("../entities/seller.entity");
 const bcrypt = __importStar(require("bcrypt"));
 const jwt_1 = require("@nestjs/jwt");
+const admin_service_1 = require("../../admin/admin.service");
 let SellerAuthService = class SellerAuthService {
     sellerRepo;
     jwtService;
-    constructor(sellerRepo, jwtService) {
+    adminService;
+    constructor(sellerRepo, jwtService, adminService) {
         this.sellerRepo = sellerRepo;
         this.jwtService = jwtService;
+        this.adminService = adminService;
     }
     async register(dto) {
-        const exists = await this.sellerRepo.findOne({
-            where: [{ email: dto.email }, { phone: dto.phone }],
+        const { fullName, email, password, phone, shopName } = dto;
+        const existingSeller = await this.sellerRepo.findOne({ where: { email } });
+        if (existingSeller) {
+            throw new common_1.ConflictException('Email already exists');
+        }
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+        const newSeller = this.sellerRepo.create({
+            fullName,
+            email,
+            phone,
+            shopName,
+            password: hashedPassword,
+            status: seller_entity_1.SellerStatus.PENDING,
         });
-        if (exists)
-            throw new common_1.ConflictException('Email or phone already exists');
-        const seller = this.sellerRepo.create(dto);
-        const saved = await this.sellerRepo.save(seller);
-        const payload = { sub: saved.id, role: 'SELLER' };
-        return {
-            access_token: this.jwtService.sign(payload),
-            seller: { id: saved.id, email: saved.email, status: saved.status },
-        };
+        const savedSeller = await this.sellerRepo.save(newSeller);
+        if (savedSeller) {
+            await this.adminService.triggerNewSellerNotification(savedSeller.fullName);
+        }
+        return { message: 'Registration successful! Please wait for admin approval.' };
     }
     async login(dto) {
-        const seller = await this.sellerRepo.findOne({ where: { email: dto.email } });
-        if (!seller || !(await bcrypt.compare(dto.password, seller.password))) {
-            throw new common_1.UnauthorizedException('Invalid credentials');
+        const seller = await this.sellerRepo.findOne({
+            where: { email: dto.email },
+            select: ['id', 'email', 'password', 'fullName', 'status']
+        });
+        if (!seller) {
+            throw new common_1.UnauthorizedException('Invalid email or password');
         }
-        const payload = { sub: seller.id, role: 'SELLER' };
+        if (seller.status === seller_entity_1.SellerStatus.PENDING) {
+            throw new common_1.UnauthorizedException('Account is under review. Please wait for Admin approval.');
+        }
+        if (seller.status === seller_entity_1.SellerStatus.REJECTED) {
+            throw new common_1.UnauthorizedException('Your account has been rejected by Admin.');
+        }
+        const isMatch = await bcrypt.compare(dto.password, seller.password);
+        if (!isMatch) {
+            throw new common_1.UnauthorizedException('Invalid email or password');
+        }
+        const payload = { sub: seller.id, email: seller.email, role: 'seller' };
         return {
             access_token: this.jwtService.sign(payload),
-            seller: { id: seller.id, email: seller.email, status: seller.status },
+            seller: {
+                id: seller.id,
+                name: seller.fullName,
+                email: seller.email,
+                status: seller.status,
+            },
         };
     }
 };
@@ -90,6 +119,7 @@ exports.SellerAuthService = SellerAuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(seller_entity_1.Seller)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        admin_service_1.AdminService])
 ], SellerAuthService);
 //# sourceMappingURL=seller-auth.service.js.map

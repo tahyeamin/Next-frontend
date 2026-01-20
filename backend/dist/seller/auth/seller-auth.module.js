@@ -14,6 +14,7 @@ const seller_auth_service_1 = require("./seller-auth.service");
 const seller_jwt_strategy_1 = require("./seller-jwt.strategy");
 const typeorm_1 = require("@nestjs/typeorm");
 const seller_entity_1 = require("../entities/seller.entity");
+const admin_module_1 = require("../../admin/admin.module");
 let SellerAuthModule = class SellerAuthModule {
 };
 exports.SellerAuthModule = SellerAuthModule;
@@ -25,6 +26,7 @@ exports.SellerAuthModule = SellerAuthModule = __decorate([
                 secret: process.env.SELLER_JWT_SECRET || 'seller-secret-12345',
                 signOptions: { expiresIn: '7d' },
             }),
+            admin_module_1.AdminModule,
         ],
         controllers: [seller_auth_controller_1.SellerAuthController],
         providers: [seller_auth_service_1.SellerAuthService, seller_jwt_strategy_1.SellerJwtStrategy],

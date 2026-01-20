@@ -16,6 +16,7 @@ async function bootstrap() {
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
     });
+    app.useGlobalPipes(new common_1.ValidationPipe());
     await app.listen(3000);
     console.log('Server running at http://localhost:3000');
 }

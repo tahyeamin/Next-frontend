@@ -16,10 +16,14 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: 'http://localhost:3001', // ফ্রন্টএন্ডের পোর্ট
+    origin: 'http://localhost:3001', 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+app.useGlobalPipes(new ValidationPipe());
+
+
   await app.listen(3000);
   console.log('Server running at http://localhost:3000');
 }

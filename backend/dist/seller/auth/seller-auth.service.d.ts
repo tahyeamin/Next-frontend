@@ -1,26 +1,24 @@
 import { Repository } from 'typeorm';
-import { Seller } from '../entities/seller.entity';
+import { Seller, SellerStatus } from 'src/seller/entities/seller.entity';
 import { SellerRegisterDto } from './dto/seller-register.dto';
 import { SellerLoginDto } from './dto/seller-login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { AdminService } from 'src/admin/admin.service';
 export declare class SellerAuthService {
     private sellerRepo;
     private jwtService;
-    constructor(sellerRepo: Repository<Seller>, jwtService: JwtService);
+    private adminService;
+    constructor(sellerRepo: Repository<Seller>, jwtService: JwtService, adminService: AdminService);
     register(dto: SellerRegisterDto): Promise<{
-        access_token: string;
-        seller: {
-            id: string;
-            email: string;
-            status: import("../entities/seller.entity").SellerStatus;
-        };
+        message: string;
     }>;
     login(dto: SellerLoginDto): Promise<{
         access_token: string;
         seller: {
             id: string;
+            name: string;
             email: string;
-            status: import("../entities/seller.entity").SellerStatus;
+            status: SellerStatus.APPROVED | SellerStatus.BLOCKED;
         };
     }>;
 }

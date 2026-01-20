@@ -1,19 +1,23 @@
-import {IsEmail, IsString, MinLength, IsMobilePhone, isMobilePhone } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional } from 'class-validator';
 
 export class SellerRegisterDto {
-    @IsString()
-    fullName: string;
+  @IsNotEmpty()
+  @IsString()
+  fullName: string;
 
-    @IsEmail()
-    email: string;
+  @IsEmail()
+  email: string;
 
-    @IsMobilePhone('bn-BD')
-    phone: string;
+  @IsNotEmpty()
+  @MinLength(6, { message: 'Password must be at least 6 characters' })
+  password: string;
 
-    @IsString()
-    @MinLength(8)
-    password: string;
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
 
-    
-
+ 
+  @IsOptional() 
+  @IsString()
+  shopName?: string; 
 }

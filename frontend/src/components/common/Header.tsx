@@ -1,42 +1,76 @@
 "use client";
+
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Store } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 export default function Header() {
-  const pathname = usePathname();
-
-  // যদি আমরা ড্যাশবোর্ডে থাকি, তবে এই হেডার রেন্ডার হবে না
-  if (pathname.includes("/dashboard")) {
-    return null;
-  }
-
   return (
-    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 z-50">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        {/* লোগো */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
-            <Store className="w-6 h-6" />
+    <header 
+      className="sticky top-0 z-50 w-full shadow-md"
+      // 🔥 ব্যাকগ্রাউন্ড কালো, টেক্সট সাদা
+      style={{ backgroundColor: '#000000', color: '#ffffff', borderBottom: '1px solid #333' }}
+    >
+      {/* 🔥 container Width: 1000px দেওয়া হয়েছে যাতে একদম দুই কোণায় না যায়।
+         🔥 margin: '0 auto' দিয়ে পুরোটা মাঝখানে রাখা হয়েছে।
+         🔥 display: 'flex' এবং justify-content: 'space-between' দিয়ে দুই মাথায় সরানো হয়েছে।
+      */}
+      <div 
+        style={{ 
+          maxWidth: '1000px', 
+          margin: '0 auto', 
+          height: '80px', 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          padding: '0 20px'
+        }}
+      >
+          
+        {/* ১. বাম পাশে: লোগো */}
+        <Link href="/" className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+          <div className="p-2 bg-white rounded-lg text-black">
+            <ShoppingBag className="w-6 h-6" />
           </div>
-          <span className="text-xl font-bold text-slate-900">SellerHub</span>
+          <span className="text-xl font-bold tracking-wide" style={{ color: '#ffffff' }}>
+            Shop<span className="text-blue-500">Verse</span>
+          </span>
         </Link>
 
-        {/* লিংকস */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-          <Link href="/" className="hover:text-blue-600">Home</Link>
-          <Link href="#" className="hover:text-blue-600">Features</Link>
-          <Link href="#" className="hover:text-blue-600">Pricing</Link>
-        </div>
+        {/* ২. ডান পাশে: মেনু */}
+        {/* 🔥 gap: '40px' - এটা আইটেমগুলোর মধ্যে গ্যাপ তৈরি করবেই */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '40px', fontSize: '15px', fontWeight: '500' }}>
+          
+          
 
-        {/* বাটন */}
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-bold text-slate-600 hover:text-blue-600">Login</Link>
-          <Link href="/register" className="px-5 py-2.5 bg-blue-600 text-white rounded-full text-sm font-bold hover:bg-blue-700 transition">
-            Start Selling
+      <Link href="/admin/dashboard" style={{ color: '#ffffff', textDecoration: 'none' }}>
+            Admin
           </Link>
-        </div>
+          
+          <Link href="/about" style={{ color: '#ffffff', textDecoration: 'none' }}>
+            About
+          </Link>
+
+          <Link href="/login" style={{ color: '#ffffff', textDecoration: 'none' }}>
+            Login
+          </Link>
+
+          <Link 
+            href="/register" 
+            style={{ 
+              backgroundColor: '#ffffff', 
+              color: '#000000', 
+              padding: '10px 20px', 
+              borderRadius: '9999px', 
+              textDecoration: 'none',
+              fontWeight: 'bold'
+            }}
+          >
+            Become a Seller
+          </Link>
+
+        </nav>
+
       </div>
-    </nav>
+    </header>
   );
 }
