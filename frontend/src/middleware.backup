@@ -1,0 +1,36 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // ১. বর্তমান পাথ বা URL নেওয়া
+  const path = request.nextUrl.pathname;
+
+  // ২. পাবলিক পাথ ডিফাইন করা
+  const isPublicPath = path === '/login' || path === '/register';
+  
+  // ৩. ব্রাউজারের কুকি থেকে টোকেন খোঁজা
+  // (নোট: লোকাল স্টোরেজ সার্ভারে কাজ করে না, তাই কুকি বা সাধারণ লজিক চেক করা হচ্ছে)
+  const token = request.cookies.get('token')?.value || '';
+
+  // ৪. লজিক: যদি পাবলিক পেজে থাকে এবং টোকেন থাকে -> ড্যাশবোর্ডে পাঠাও
+  if (isPublicPath && token) {
+    return NextResponse.redirect(new URL('/dashboard', request.nextUrl));
+  }
+
+  // ৫. লজিক: যদি ড্যাশবোর্ডে যেতে চায় কিন্তু টোকেন না থাকে -> লগইনে পাঠাও
+  if (!isPublicPath && !token && path.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login', request.nextUrl));
+  }
+
+  // সব ঠিক থাকলে রিকোয়েস্ট চলতে দাও
+  return NextResponse.next();
+}
+
+// ৬. কোন কোন রুটে এই মিডলওয়্যার কাজ করবে
+export const config = {
+  matcher: [
+    '/login',
+    '/register',
+    '/dashboard/:path*',
+  ],
+};

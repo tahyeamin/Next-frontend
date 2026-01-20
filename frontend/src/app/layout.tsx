@@ -18,8 +18,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-     <body className={`${inter.className} min-h-screen flex flex-col bg-slate-50 text-slate-900`}>
-        {/* হেডার কম্পোনেন্ট (লজিক ভেতরে আছে) */}
+      <body 
+        className={`${inter.className} min-h-screen flex flex-col bg-slate-50 text-slate-900`}
+        // 👇 এই লাইনটি এই এরর ফিক্স করবে
+        suppressHydrationWarning={true} 
+      >
+        
+        {/* হেডার কম্পোনেন্ট */}
         <Header />
         
         <main className="min-h-screen">
